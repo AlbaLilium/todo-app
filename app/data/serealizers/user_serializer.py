@@ -26,3 +26,7 @@ class UserAuthRequestSerializer(BaseModel):
 
 class UserCheckRequestSerializer(BaseModel):
     username: str
+
+
+class UserGetTasksRequestSerializer(BaseModel):
+    id: int

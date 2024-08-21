@@ -1,20 +1,15 @@
 from fastapi import HTTPException
-from sqlalchemy import or_
 from app.data.models.task_model import Task as TaskModel
 from app.controllers.queries.base_queries import BaseOperation
 from app.data.serealizers.task_serializer import TaskBase, TaskListResponseSerializer, TaskUpdateRequestSerializer, \
-    TaskDeleteRequestSerializer, TaskFilterRequestSerializer, TaskGetRequestSerializer
+    TaskStatusRequestSerializer, SingleTaskRequestSerializer
+from app.data.serealizers.user_serializer import UserGetTasksRequestSerializer
 
 
 class TaskOperation(BaseOperation):
-    def get_task_by_id(self, task: TaskGetRequestSerializer) -> TaskListResponseSerializer:
+    def get_task(self, task: SingleTaskRequestSerializer) -> TaskListResponseSerializer:
 
-        query_obj_result = self.session.query(TaskModel).filter(
-            or_(
-                TaskModel.id == task.task_id,
-                TaskModel.user_id == task.user_id
-            )
-        ).all()
+        query_obj_result = self.session.query(TaskModel).filter(TaskModel.id == task.task_id).all()
 
         if not query_obj_result:
             raise HTTPException(status_code=400, detail="Object does not exist")
@@ -78,5 +73,13 @@ class TaskOperation(BaseOperation):
 
         else:
             query_obj_result = self.session.query(TaskModel).where(TaskModel.status == task.status).all()
+
+        return TaskListResponseSerializer(tasks=query_obj_result)
+
+    def get_users_tasks(self, user: UserGetTasksRequestSerializer):
+        query_obj_result = self.session.query(TaskModel).filter(TaskModel.user_id == user.id).all()
+
+        if not query_obj_result:
+            raise HTTPException(status_code=400, detail="Object does not exist")
 
         return TaskListResponseSerializer(tasks=query_obj_result)
