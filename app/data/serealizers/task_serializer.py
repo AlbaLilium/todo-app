@@ -31,10 +31,5 @@ class TaskFilterRequestSerializer(BaseModel):
     user_id: int | None
 
 
-class TaskDeleteRequestSerializer(BaseModel):
+class SingleTaskRequestSerializer(BaseModel):
     id: int
-
-
-class TaskGetRequestSerializer(BaseModel):
-    id: int | None
-    user_id: int | None

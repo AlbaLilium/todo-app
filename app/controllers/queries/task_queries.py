@@ -52,7 +52,7 @@ class TaskOperation(BaseOperation):
                         status=task_obj.status,
                         user_id=task_obj.user_id)
 
-    def delete_task(self, task: TaskDeleteRequestSerializer) -> str:
+    def delete_task(self, task: SingleTaskRequestSerializer) -> str:
 
         task_obj = self.session.query(TaskModel).filter(TaskModel.id == task.task_id).all()
 
