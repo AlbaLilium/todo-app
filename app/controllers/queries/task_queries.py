@@ -16,10 +16,11 @@ class TaskOperation(BaseOperation):
 
         return TaskListResponseSerializer(tasks=query_obj_result)
 
-    def get_all_tasks(self) -> TaskListResponseSerializer:
+    def get_all_tasks(self, page_size: int, page_number: int) -> TaskListResponseSerializer:
 
-        query_obj_result = self.session.query(TaskModel).all()
-        return TaskListResponseSerializer(tasks=query_obj_result)
+        query_obj_result = self.session.query(TaskModel)
+        query_obj_result = self.paginate(query_obj_result, page_size, page_number)
+        return TaskListResponseSerializer(tasks=query_obj_result.all())
 
     def update_task_by_field(self, task: TaskUpdateRequestSerializer) -> TaskBase:
 
@@ -63,21 +64,18 @@ class TaskOperation(BaseOperation):
 
         return "Object is deleted successfully"
 
-    def filter_by_status(self, task: TaskStatusRequestSerializer) -> TaskListResponseSerializer:
+    def filter_by_status(self, task: TaskStatusRequestSerializer, page_size, page_number) -> TaskListResponseSerializer:
 
         if task.user_id:
             query_obj_result = self.session.query(TaskModel).where(
                 TaskModel.user_id == task.user_id,
                 TaskModel.status == task.status,
-            ).all()
+            )
 
         else:
-            query_obj_result = self.session.query(TaskModel).where(TaskModel.status == task.status).all()
-
-        return TaskListResponseSerializer(tasks=query_obj_result)
-
-    def get_users_tasks(self, user: UserGetTasksRequestSerializer):
-        query_obj_result = self.session.query(TaskModel).filter(TaskModel.user_id == user.id).all()
+            query_obj_result = self.session.query(TaskModel).where(TaskModel.status == task.status)
+        query_obj_result = self.paginate(query_obj_result, page_size=page_size, page_number=page_number)
+        return TaskListResponseSerializer(tasks=query_obj_result.all())
 
         if not query_obj_result:
             raise HTTPException(status_code=400, detail="Object does not exist")

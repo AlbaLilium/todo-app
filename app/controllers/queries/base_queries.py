@@ -1,3 +1,5 @@
+from sqlalchemy.orm import Query
+
 from app.db.db_connection import SessionLocal
 
 
@@ -12,3 +14,7 @@ class BaseOperation:
             self.session.rollback()
         finally:
             self.session.close()
+
+    @staticmethod
+    def paginate(query: Query, page_size: int, page_number: int) -> Query:
+        return query.limit(page_size).offset(page_size * (page_number - 1))
