@@ -26,7 +26,7 @@ class TaskListResponseSerializer(BaseModel):
         orm_mode = True
 
 
-class TaskFilterRequestSerializer(BaseModel):
+class TaskStatusRequestSerializer(BaseModel):
     status: str
     user_id: int | None
 

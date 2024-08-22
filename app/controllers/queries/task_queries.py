@@ -63,7 +63,7 @@ class TaskOperation(BaseOperation):
 
         return "Object is deleted successfully"
 
-    def filter_by_status(self, task: TaskFilterRequestSerializer) -> TaskListResponseSerializer:
+    def filter_by_status(self, task: TaskStatusRequestSerializer) -> TaskListResponseSerializer:
 
         if task.user_id:
             query_obj_result = self.session.query(TaskModel).where(
