@@ -77,7 +77,10 @@ class TaskOperation(BaseOperation):
         query_obj_result = self.paginate(query_obj_result, page_size=page_size, page_number=page_number)
         return TaskListResponseSerializer(tasks=query_obj_result.all())
 
+    def get_users_tasks(self, user: UserGetTasksRequestSerializer, page_size: int, page_number:int):
+        query_obj_result = self.session.query(TaskModel).filter(TaskModel.user_id == user.id)
+        query_obj_result = self.paginate(query_obj_result, page_size, page_number)
         if not query_obj_result:
             raise HTTPException(status_code=400, detail="Object does not exist")
 
-        return TaskListResponseSerializer(tasks=query_obj_result)
+        return TaskListResponseSerializer(tasks=query_obj_result.all())
