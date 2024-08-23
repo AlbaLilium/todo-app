@@ -3,7 +3,7 @@ from app.data.models.task_model import Task as TaskModel
 from app.controllers.queries.base_queries import BaseOperation
 from app.data.serealizers.task_serializer import TaskBase, TaskListResponseSerializer, TaskUpdateRequestSerializer, \
     TaskStatusRequestSerializer, SingleTaskRequestSerializer
-from app.data.serealizers.user_serializer import UserGetTasksRequestSerializer
+from app.data.serealizers.user_serializer import UserGetRequestSerializer
 
 
 class TaskOperation(BaseOperation):
@@ -77,7 +77,7 @@ class TaskOperation(BaseOperation):
         query_obj_result = self.paginate(query_obj_result, page_size=page_size, page_number=page_number)
         return TaskListResponseSerializer(tasks=query_obj_result.all())
 
-    def get_users_tasks(self, user: UserGetTasksRequestSerializer, page_size: int, page_number:int):
+    def get_users_tasks(self, user: UserGetRequestSerializer, page_size: int, page_number:int):
         query_obj_result = self.session.query(TaskModel).filter(TaskModel.user_id == user.id)
         query_obj_result = self.paginate(query_obj_result, page_size, page_number)
         if not query_obj_result:
