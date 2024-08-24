@@ -1,4 +1,4 @@
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 
 class PostgresSettings(BaseSettings):
@@ -13,4 +13,4 @@ class PostgresSettings(BaseSettings):
         return f"postgresql+psycopg2://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
 
 
-settings = PostgresSettings()
+# settings = PostgresSettings()
