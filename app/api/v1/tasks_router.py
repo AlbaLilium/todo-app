@@ -8,7 +8,7 @@ from app.data.enum import TaskStatusEnum
 from app.data.serealizers.task_serializer import SingleTaskRequestSerializer, TaskUpdateRequestSerializer, \
     TaskStatusRequestSerializer, TaskBase, TaskListResponseSerializer
 from app.data.serealizers.utils_serializer import Pagination
-from .users_router import security
+from app.api.v1.auth_router import security
 
 tasks_router = APIRouter(
     prefix="/task",

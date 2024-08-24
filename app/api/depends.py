@@ -1,6 +1,7 @@
-from fastapi import HTTPException, Depends
+from typing import Annotated
+from fastapi import HTTPException, Depends, status
 
-from app.api.v1.users_router import oauth2_scheme
+from app.api.v1.auth_router import oauth2_scheme
 from app.controllers.queries.user_queries import UserOperation
 from app.controllers.token import verify_access_token, verify_password
 from app.data.serealizers.user_serializer import UserCheckRequestSerializer, UserBase, UserGetRequestSerializer
