@@ -4,7 +4,7 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials
 
-from app.api.v1.auth_router import security
+from app.controllers.utils import security, oauth2_scheme
 from app.controllers.queries.task_queries import TaskOperation
 from app.data.serealizers.task_serializer import TaskListResponseSerializer
 from app.data.serealizers.user_serializer import UserGetRequestSerializer

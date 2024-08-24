@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, status, Depends, HTTPException
 from fastapi.security import HTTPBearer, OAuth2PasswordRequestForm, OAuth2PasswordBearer
 
+from app.controllers.utils import security, oauth2_scheme
 from app.api.depends import has_authenticated_user
 from app.controllers.queries.user_queries import UserOperation
 from app.controllers.token import login_for_access_token
@@ -14,9 +15,6 @@ auth_router = APIRouter(
     prefix="/user/auth",
     tags=["Auth"]
 )
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-security = HTTPBearer()
-
 
 @auth_router.post("/sign-up", status_code=status.HTTP_201_CREATED, response_model=Token)
 def sign_up(user: UserCreateRequestSerializer):

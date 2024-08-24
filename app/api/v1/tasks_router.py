@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query, Depends, status, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
+from app.controllers.utils import security, oauth2_scheme
 
 from app.controllers.queries.task_queries import TaskOperation
 from app.data.enum import TaskStatusEnum
