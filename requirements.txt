@@ -1,5 +1,6 @@
 SQLAlchemy==2.0.32
 fastapi==0.112.0
+psycopg2 == 2.9.9
 pydantic==2.8.2
 PyJWT==2.9.0
 passlib~=1.7.4
