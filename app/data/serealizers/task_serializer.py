@@ -3,23 +3,24 @@ from pydantic import BaseModel
 
 class TaskBase(BaseModel):
     """
-      Base Serializer for Task.
+    Base Serializer for Task.
 
-       ...
+     ...
 
-       Attributes
-       ----------
-        id : int
-        title: str
-        description: str | None
-        status: str
-        user_id: int
+     Attributes
+     ----------
+      id : int
+      title: str
+      description: str | None
+      status: str
+      user_id: int
 
-       Notes
-       ------
-        ORM reading is supported
+     Notes
+     ------
+      ORM reading is supported
 
     """
+
     id: int
     title: str
     description: str | None
@@ -32,18 +33,19 @@ class TaskBase(BaseModel):
 
 class TaskUpdateRequestSerializer(BaseModel):
     """
-      Task serializer for updating requests.
+    Task serializer for updating requests.
 
-       ...
+     ...
 
-       Attributes
-       ----------
-        id : int
-        title: str
-        description: str | None
-        status: str
+     Attributes
+     ----------
+      id : int
+      title: str
+      description: str | None
+      status: str
 
     """
+
     id: int
     title: str | None
     description: str | None
@@ -52,18 +54,18 @@ class TaskUpdateRequestSerializer(BaseModel):
 
 class TaskListResponseSerializer(BaseModel):
     """
-      Base Serializer for Task.
+    Base Serializer for Task.
 
-       ...
+     ...
 
-       Attributes
-       ----------
-        tasks: list[TaskBase]
+     Attributes
+     ----------
+      tasks: list[TaskBase]
 
-       Notes
-       ------
-        ORM reading is supported
-        See TaskBase for more information.
+     Notes
+     ------
+      ORM reading is supported
+      See TaskBase for more information.
 
     """
 
@@ -75,29 +77,31 @@ class TaskListResponseSerializer(BaseModel):
 
 class TaskStatusRequestSerializer(BaseModel):
     """
-      Task Serializer for filtering status's request.
+    Task Serializer for filtering status's request.
 
-       ...
+     ...
 
-       Attributes
-       ----------
-        status: str
-        user_id: int | None
+     Attributes
+     ----------
+      status: str
+      user_id: int | None
 
     """
+
     status: str
     user_id: int | None
 
 
 class SingleTaskRequestSerializer(BaseModel):
     """
-      Task Serializer for GET and DELETE requests.
+    Task Serializer for GET and DELETE requests.
 
-       ...
+     ...
 
-       Attributes
-       ----------
-        id : int
+     Attributes
+     ----------
+      id : int
 
     """
+
     id: int

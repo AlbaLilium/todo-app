@@ -3,15 +3,16 @@ from pydantic import BaseModel
 
 class Pagination(BaseModel):
     """
-      Pagination Serializer.
+    Pagination Serializer.
 
-       ...
+     ...
 
-       Attributes
-       ----------
-        page_size: int
-        page_number: int
+     Attributes
+     ----------
+      page_size: int
+      page_number: int
 
     """
+
     page_size: int
     page_number: int

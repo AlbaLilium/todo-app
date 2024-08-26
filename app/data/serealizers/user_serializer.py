@@ -3,21 +3,22 @@ from pydantic import BaseModel
 
 class UserBase(BaseModel):
     """
-      Base Serializer for User.
+    Base Serializer for User.
 
-       ...
+     ...
 
-       Attributes
-       ----------
-        id: int
-        first_name: str
-        last_name: str | None
-        username: str
+     Attributes
+     ----------
+      id: int
+      first_name: str
+      last_name: str | None
+      username: str
 
-       Notes
-       ------
-        ORM reading is supported
+     Notes
+     ------
+      ORM reading is supported
     """
+
     id: int
     first_name: str
     last_name: str | None
@@ -29,17 +30,19 @@ class UserBase(BaseModel):
 
 class UserCreateRequestSerializer(BaseModel):
     """
-      User serializer for registration requests.
+    User serializer for registration requests.
 
-       ...
+     ...
 
-       Attributes
-       ----------
-        first_name: str
-        last_name: str | None
-        username: str
+     Attributes
+     ----------
+      first_name: str
+      last_name: str | None
+      username: str
+      password: str
 
     """
+
     first_name: str
     last_name: str | None
     username: str
@@ -48,29 +51,30 @@ class UserCreateRequestSerializer(BaseModel):
 
 class UserAuthRequestSerializer(BaseModel):
     """
-      User serializer for authentication requests.
+    User serializer for authentication requests.
 
-       ...
+     ...
 
-       Attributes
-       ----------
-       username: str
-       password: str
+     Attributes
+     ----------
+     username: str
+     password: str
 
     """
+
     username: str
     password: str
 
 
 class UserCheckRequestSerializer(BaseModel):
     """
-      User serializer for registration requests.
+    User serializer for registration requests.
 
-       ...
+     ...
 
-       Attributes
-       ----------
-        username: str
+     Attributes
+     ----------
+      username: str
 
     """
     username: str
@@ -78,13 +82,14 @@ class UserCheckRequestSerializer(BaseModel):
 
 class UserGetRequestSerializer(BaseModel):
     """
-      User serializer for getting user's tasks requests.
+    User serializer for getting user's tasks requests.
 
-       ...
+     ...
 
-      Attributes
-      ----------
-       id: int
+    Attributes
+    ----------
+     id: int
 
     """
+
     id: int
