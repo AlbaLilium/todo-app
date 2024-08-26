@@ -5,3 +5,5 @@ pydantic==2.8.2
 PyJWT==2.9.0
 passlib~=1.7.4
 alembic==1.13.2
+isort==5.13.2
+black==24.8.0
