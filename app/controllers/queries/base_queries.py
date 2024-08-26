@@ -1,20 +1,20 @@
 from sqlalchemy.orm import Query
 
-from app.db.db_connection import SessionLocal
+from app.db.db_connection import AsyncSession
 
 
 class BaseOperation:
-    def __enter__(self):
-        self.session = SessionLocal()
+    async def __aenter__(self):
+        self.session = AsyncSession()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
         try:
-            self.session.commit()
+            await self.session.commit()
         except exc_type:
-            self.session.rollback()
+            await self.session.rollback()
         finally:
-            self.session.close()
+            await self.session.close()
 
     @staticmethod
     def paginate(query: Query, page_size: int, page_number: int) -> Query:
