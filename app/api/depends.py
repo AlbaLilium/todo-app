@@ -6,6 +6,18 @@ from app.data.serealizers.user_serializer import (UserAuthRequestSerializer)
 
 
 async def has_authenticated_user(username: str, password: str) -> bool:
+    """
+    Check user existence and password correctness.
+
+    Parameters
+    ----------
+    username: str
+    password: str
+
+    Returns
+    -------
+    result: bool
+    """
     async with UserOperation() as db:
         user = UserAuthRequestSerializer(username=username, password=password)
         is_user_existed = await db.check_user(user)

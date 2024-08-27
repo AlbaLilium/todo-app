@@ -18,6 +18,16 @@ auth_router = APIRouter(prefix="/user/auth", tags=["Auth"])
 
 @auth_router.post("/sign-up", status_code=status.HTTP_201_CREATED, response_model=Token)
 async def sign_up(user: UserCreateRequestSerializer):
+    """
+    Create and authorize user. Return HTTP 400 for password smaller than 6 symbols.
+    Parameters
+    ----------
+    user: UserCreateRequestSerializer
+
+    Returns
+    -------
+    token: Token
+    """
     if len(user.password) < 6:
         raise HTTPException(
             status_code=400, detail="Password should be 6 or more symbols"
@@ -29,6 +39,17 @@ async def sign_up(user: UserCreateRequestSerializer):
 
 @auth_router.post("/sign-in", response_model=Token, tags=["Auth"])
 async def sign_in(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
+    """
+    Authorize user.
+
+    Parameters
+    ----------
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
+
+    Returns
+    -------
+    token: Token
+    """
     user = UserAuthRequestSerializer(
         username=form_data.username, password=form_data.password
     )

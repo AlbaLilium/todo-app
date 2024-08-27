@@ -24,6 +24,19 @@ async def get_user_tasks(
     user_id: Annotated[int, Path(gt=0)],
     pagination: Pagination = Depends(get_pagination_params),
 ):
+    """
+    Get all users tasks.
+
+    Parameters
+    ----------
+    credentials : Annotated[HTTPAuthorizationCredentials, Depends(security)]
+    user_id: int
+    pagination: Pagination = Depends(get_pagination_params)
+
+    Returns
+    -------
+    task_list: TaskListResponseSerializer
+    """
     async with TaskOperation() as db:
         tasks_list = await db.get_users_tasks(
             user_id, page_size=pagination.page_size, page_number=pagination.page_number
