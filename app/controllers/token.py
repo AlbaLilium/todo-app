@@ -1,11 +1,10 @@
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 
 import jwt
 from jwt import InvalidTokenError
 from passlib.context import CryptContext
 
 from app.data.serealizers.token_serializer import Token, TokenData
-from app.data.serealizers.user_serializer import UserAuthRequestSerializer
 
 SECRET_KEY = "89cde5ad430269aa6b30dbfea06b3e71ea7169cce0b843fab10c034d12ad8d6f"
 ALGORITHM = "HS256"
@@ -45,9 +44,9 @@ def verify_access_token(token: str, credentials_exception) -> TokenData:
     return token_data
 
 
-def login_for_access_token(user: UserAuthRequestSerializer) -> Token:
+def login_for_access_token(user_id: int) -> Token:
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.id}, expires_delta=access_token_expires
+        data={"sub": user_id}, expires_delta=access_token_expires
     )
-    return Token(access_token=access_token, token_type="bearer")
+    return Token(access_token=access_token, type_token="bearer")

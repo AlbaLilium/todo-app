@@ -1,31 +1,32 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Path, Query, status
 from fastapi.security import HTTPAuthorizationCredentials
 
 from app.controllers.queries.task_queries import TaskOperation
-from app.controllers.utils import security, is_status_correct
+from app.controllers.utils import is_status_correct, security
 from app.data.enum import TaskStatusEnum
-from app.data.serealizers.task_serializer import (SingleTaskRequestSerializer,
+from app.data.serealizers.task_serializer import (CreateTaskSerializer,
+                                                  SingleTaskRequestSerializer,
                                                   TaskBase,
                                                   TaskListResponseSerializer,
                                                   TaskStatusRequestSerializer,
                                                   TaskUpdateRequestSerializer)
 from app.data.serealizers.utils_serializer import Pagination
 
-tasks_router = APIRouter(prefix="/task", tags=["Task"])
+tasks_router = APIRouter(prefix="/tasks", tags=["Task"])
 
 
 def get_pagination_params(
-        page_number: int = Query(1, ge=0), page_size: int = Query(10, gt=0)
+    page_number: int = Query(1, ge=0), page_size: int = Query(10, gt=0)
 ):
     return Pagination(page_number=page_number, page_size=page_size)
 
 
 @tasks_router.get("/", response_model=TaskListResponseSerializer)
 async def get_all_tasks(
-        credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
-        pagination: Pagination = Depends(get_pagination_params),
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
+    pagination: Pagination = Depends(get_pagination_params),
 ):
     async with TaskOperation() as db:
         tasks_list = await db.get_all_tasks(
@@ -36,18 +37,18 @@ async def get_all_tasks(
 
 @tasks_router.get("/{task_id}")
 async def get_task(
-        data: SingleTaskRequestSerializer,
-        credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
+    task_id: Annotated[int, Path(gt=0)],
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
 ):
     async with TaskOperation() as db:
-        tasks_list = await db.get_task(data)
+        tasks_list = await db.get_task(task_id)
     return tasks_list
 
 
-@tasks_router.patch("/{task_id}", response_model=TaskBase)
+@tasks_router.patch("/update/{task_id}", response_model=TaskBase)
 async def update_task(
-        task: TaskUpdateRequestSerializer,
-        credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
+    task: TaskUpdateRequestSerializer,
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
 ):
     if task.status and is_status_correct(task.status):
         async with TaskOperation() as db:
@@ -55,42 +56,47 @@ async def update_task(
     return updated_task
 
 
-@tasks_router.patch("/{task_id}")
+@tasks_router.patch("/complete/{task_id}")
 async def complete_task(
-        task: TaskStatusRequestSerializer,
-        credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
+    task_id: Annotated[int, Path(gt=0)],
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
+    status: str = TaskStatusEnum.completed.value,
 ):
-    task.status = TaskStatusEnum.completed.value
-    return await update_task(task)
+    task = TaskUpdateRequestSerializer(
+        id=task_id, status=status, description=None, title=None
+    )
+    return await update_task(task=task, credentials=credentials)
 
 
-@tasks_router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
+@tasks_router.delete("/delete/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_task(
-        task: SingleTaskRequestSerializer,
-        credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
+    task: SingleTaskRequestSerializer,
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
 ):
     async with TaskOperation() as db:
         response = await db.delete_task(task)
         return {"message": response}
 
 
-@tasks_router.post("")
+@tasks_router.post(
+    "/create/{task_id}",
+)
 async def create_task(
-        task: TaskBase,
-        credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
+    task: CreateTaskSerializer,
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
 ):
-    if is_status_correct(status):
+    if is_status_correct(task.status):
         async with TaskOperation() as db:
-            new_task = await db.insert_task(task)
-    return new_task
+            new_task_id = await db.insert_task(task)
+        return {"id": str(new_task_id)}
 
 
-@tasks_router.get("")
+@tasks_router.get("/filter/{task_id}")
 async def filter_task_by_status(
-        status: Annotated[str, Query(max_length=50)],
-        credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
-        pagination: Pagination = Depends(get_pagination_params),
-        user_id: Annotated[int | None, Query(max_length=50, gt=0)] = None,
+    status: Annotated[str, Query(max_length=50)],
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
+    pagination: Pagination = Depends(get_pagination_params),
+    user_id: Annotated[int | None, Path(gt=0)] = None,
 ):
     filter_tasks = TaskStatusRequestSerializer(status=status, user_id=user_id)
     if is_status_correct(status):

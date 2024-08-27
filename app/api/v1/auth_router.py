@@ -10,7 +10,8 @@ from app.controllers.token import login_for_access_token
 from app.controllers.utils import oauth2_scheme, security
 from app.data.serealizers.token_serializer import Token
 from app.data.serealizers.user_serializer import (UserAuthRequestSerializer,
-                                                  UserCreateRequestSerializer, UserCheckRequestSerializer)
+                                                  UserCheckRequestSerializer,
+                                                  UserCreateRequestSerializer)
 
 auth_router = APIRouter(prefix="/user/auth", tags=["Auth"])
 
@@ -18,13 +19,12 @@ auth_router = APIRouter(prefix="/user/auth", tags=["Auth"])
 @auth_router.post("/sign-up", status_code=status.HTTP_201_CREATED, response_model=Token)
 async def sign_up(user: UserCreateRequestSerializer):
     if len(user.password) < 6:
-        return False
+        raise HTTPException(
+            status_code=400, detail="Password should be 6 or more symbols"
+        )
     async with UserOperation() as db:
-        new_user = await db.insert_user(user)
-    user_authentication = UserAuthRequestSerializer(
-        username=user.username, password=user.password
-    )
-    return await login_for_access_token(user_authentication)
+        user_id = await db.insert_user(user)
+    return login_for_access_token(user_id)
 
 
 @auth_router.post("/sign-in", response_model=Token, tags=["Auth"])
@@ -42,5 +42,8 @@ async def sign_in(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) ->
             headers={"WWW-Authenticate": "Bearer"},
         )
     async with UserOperation() as db:
-        user = await db.get_user(UserCheckRequestSerializer(username=user.username))
-        return await login_for_access_token(user)
+        user = await db.get_user_by_username(
+            UserCheckRequestSerializer(username=user.username)
+        )
+
+    return login_for_access_token(user.id)
