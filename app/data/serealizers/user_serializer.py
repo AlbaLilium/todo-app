@@ -25,7 +25,7 @@ class UserBase(BaseModel):
     username: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserCreateRequestSerializer(BaseModel):
@@ -77,6 +77,7 @@ class UserCheckRequestSerializer(BaseModel):
       username: str
 
     """
+
     username: str
 
 
@@ -93,3 +94,21 @@ class UserGetRequestSerializer(BaseModel):
     """
 
     id: int
+
+    class Config:
+        from_attributes = True
+
+
+class UsersListResponseSerializer(BaseModel):
+    """
+    User serializer for getting user's tasks requests.
+
+     ...
+
+    Attributes
+    ----------
+     users_list: list[UserBase]
+
+    """
+
+    users_list: list[UserBase]

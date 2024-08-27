@@ -28,7 +28,28 @@ class TaskBase(BaseModel):
     user_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+
+class CreateTaskSerializer(BaseModel):
+    """
+    Base Serializer for Task.
+
+     ...
+
+     Attributes
+     ----------
+      title: str
+      description: str | None
+      status: str
+      user_id: int
+
+    """
+
+    title: str
+    description: str | None
+    status: str
+    user_id: int
 
 
 class TaskUpdateRequestSerializer(BaseModel):
@@ -72,7 +93,7 @@ class TaskListResponseSerializer(BaseModel):
     tasks: list[TaskBase]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class TaskStatusRequestSerializer(BaseModel):
