@@ -5,4 +5,4 @@ from main import app
 
 @pytest.fixture
 def api_client():
-    return TestClient(app)
+    return TestClient(app=app)
