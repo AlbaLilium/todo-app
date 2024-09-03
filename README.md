@@ -180,6 +180,11 @@ Attributes:
    - ` status: str`
    - ` user_id: int | None`
 
+#### DeleteTaskRequestSerializer  
+
+- `id: int` 
+- `user_id: int`
+
 ----
  #### UserCreateRequestSerializer   
 Attributes:
@@ -330,3 +335,10 @@ Get all user's task. Raise HTTP 400 if it's not founded.
 
 - *parameter*: user_id: int, page_size: int, page_number: int
 - *return:* TaskListResponseSerializer
+
+`check_task_owner`
+
+Check the task for user ownership.
+
+- *parameter*: user_id: int, task_id: int
+- *return:* bool
