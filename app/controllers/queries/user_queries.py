@@ -24,8 +24,8 @@ class UserOperation(BaseOperation):
             last_name=user.last_name,
         )
         self.session.add(user_obj)
-        self.session.commit()
-        self.session.refresh(user_obj)
+        await self.session.commit()
+        await self.session.refresh(user_obj)
 
         return user_obj.id
 
