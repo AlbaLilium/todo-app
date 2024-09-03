@@ -71,6 +71,7 @@ class TaskUpdateRequestSerializer(BaseModel):
     title: str | None
     description: str | None
     status: str | None
+    user_id: int
 
 
 class TaskListResponseSerializer(BaseModel):
@@ -126,3 +127,19 @@ class SingleTaskRequestSerializer(BaseModel):
     """
 
     id: int
+
+class DeleteTaskRequestSerializer(BaseModel):
+    """
+    Task Serializer for DELETE requests.
+
+     ...
+
+     Attributes
+     ----------
+      id : int
+      user_id: int
+
+    """
+
+    id: int
+    user_id: int

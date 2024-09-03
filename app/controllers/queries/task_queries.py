@@ -108,3 +108,7 @@ class TaskOperation(BaseOperation):
             raise HTTPException(status_code=400, detail="Object does not exist")
 
         return TaskListResponseSerializer(tasks=query_obj_result)
+
+    async def check_task_owner(self, user_id: int, task_id:int)->bool:
+        task = await self.get_task(task_id=task_id)
+        return True if task.user_id == user_id else False

@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Path, Query, status
+from fastapi import APIRouter, Depends, Path, Query, status, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
 
 from app.controllers.queries.task_queries import TaskOperation
@@ -11,22 +11,22 @@ from app.data.serealizers.task_serializer import (CreateTaskSerializer,
                                                   TaskBase,
                                                   TaskListResponseSerializer,
                                                   TaskStatusRequestSerializer,
-                                                  TaskUpdateRequestSerializer)
+                                                  TaskUpdateRequestSerializer, DeleteTaskRequestSerializer)
 from app.data.serealizers.utils_serializer import Pagination
 
 tasks_router = APIRouter(prefix="/tasks", tags=["Task"])
 
 
 def get_pagination_params(
-    page_number: int = Query(1, ge=0), page_size: int = Query(10, gt=0)
+        page_number: int = Query(1, ge=0), page_size: int = Query(10, gt=0)
 ):
     return Pagination(page_number=page_number, page_size=page_size)
 
 
 @tasks_router.get("/", response_model=TaskListResponseSerializer)
 async def get_all_tasks(
-    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
-    pagination: Pagination = Depends(get_pagination_params),
+        credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
+        pagination: Pagination = Depends(get_pagination_params),
 ):
     """
     Get all tasks in database.
@@ -49,8 +49,8 @@ async def get_all_tasks(
 
 @tasks_router.get("/{task_id}", response_model=TaskBase)
 async def get_task(
-    task_id: Annotated[int, Path(gt=0)],
-    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)]
+        task_id: Annotated[int, Path(gt=0)],
+        credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)]
 ):
     """
     Get a task by id.
@@ -70,8 +70,8 @@ async def get_task(
 
 @tasks_router.patch("/update/{task_id}", response_model=TaskBase)
 async def update_task(
-    task: TaskUpdateRequestSerializer,
-    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
+        task: TaskUpdateRequestSerializer,
+        credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
 ):
     """
     Update task by one of fields: title, description, status.
@@ -86,15 +86,19 @@ async def update_task(
     """
     if task.status and is_status_correct(task.status):
         async with TaskOperation() as db:
-            updated_task = await db.update_task_by_field(task)
+            is_user_owned = await db.check_task_owner(task_id=task.id, user_id=task.user_id)
+            if is_user_owned:
+                updated_task = await db.update_task_by_field(task)
+            else:
+                raise HTTPException(status_code=400, detail="Not allowed")
     return updated_task
 
 
 @tasks_router.patch("/complete/{task_id}")
 async def complete_task(
-    task_id: Annotated[int, Path(gt=0)],
-    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
-    status: str = TaskStatusEnum.completed.value,
+        task_id: Annotated[int, Path(gt=0)],
+        credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
+        status: str = TaskStatusEnum.completed.value,
 ):
     task = TaskUpdateRequestSerializer(
         id=task_id, status=status, description=None, title=None
@@ -104,8 +108,8 @@ async def complete_task(
 
 @tasks_router.delete("/delete/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_task(
-    task: SingleTaskRequestSerializer,
-    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
+        task: DeleteTaskRequestSerializer,
+        credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
 ):
     """
     Delete task by id.
@@ -120,7 +124,12 @@ async def delete_task(
     response: dict[str:str]
     """
     async with TaskOperation() as db:
-        response = await db.delete_task(task)
+        is_user_owned = await db.check_task_owner(task_id=task.id, user_id=task.user_id)
+        if is_user_owned:
+            task = SingleTaskRequestSerializer(id=task.id)
+            response = await db.delete_task(task)
+        else:
+            raise HTTPException(status_code=400, detail="Not allowed")
         return {"message": response}
 
 
@@ -128,8 +137,8 @@ async def delete_task(
     "/create/{task_id}",
 )
 async def create_task(
-    task: CreateTaskSerializer,
-    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
+        task: CreateTaskSerializer,
+        credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
 ):
     """
 
@@ -151,10 +160,10 @@ async def create_task(
 
 @tasks_router.get("/filter/{task_id}")
 async def filter_task_by_status(
-    status: Annotated[str, Query(max_length=50)],
-    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
-    pagination: Pagination = Depends(get_pagination_params),
-    user_id: Annotated[int | None, Path(gt=0)] = None,
+        status: Annotated[str, Query(max_length=50)],
+        credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
+        pagination: Pagination = Depends(get_pagination_params),
+        user_id: Annotated[int | None, Path(gt=0)] = None,
 ):
     """
 
