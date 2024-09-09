@@ -11,7 +11,16 @@ for notes on deploying the project on a live system.
 ### Prerequisites
 
 Requirements for the software and other tools to build, test and push 
+
+If you run application with Docker:
 - [Docker](https://www.docker.com)
+
+If you run application locally:
+- Ubuntu 22.04.4 LTS
+- PostgresSQL 16 in port 3000 with possibility to connect it remotely.
+- Python 3.11
+> Note:
+> If 3000 port isn't free. You can change port in local.env. 
 
 ### Installing
 
@@ -19,12 +28,24 @@ Requirements for the software and other tools to build, test and push
 
 ## Build application
 
+### With Docker
+
 Use this command to build application:
 
     cd todo-app/
-    docker compose up
+    ./run_with_docker
 
 Then go to this site: http://localhost/docs
+
+### Locally
+
+Use this command to build application:
+
+    cd todo-app/
+    ./install_local
+    ./run_local
+
+Then go to this site: http://127.0.0.1:8000/docs
 
 -----
 
